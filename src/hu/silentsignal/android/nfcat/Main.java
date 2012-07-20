@@ -162,8 +162,14 @@ public class Main extends Activity
             if (!auth) throw new CommandException(getString(R.string.auth_fail));
         }
 
-        protected void readAndSendBlockContents(final int blockIndex) throws IOException {
-            final byte[] contents = mfc.readBlock(blockIndex);
+        protected void readAndSendBlockContents(final int blockIndex) {
+            byte[] contents;
+            try {
+                contents = mfc.readBlock(blockIndex);
+            } catch (IOException ioe) {
+                output.println(getString(R.string.read_error, blockIndex, ioe.getMessage()));
+                return;
+            }
             output.print("Received: ");
             for (byte b : contents) {
                 output.format("%02X", b);
