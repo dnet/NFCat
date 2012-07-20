@@ -113,6 +113,13 @@ public class Main extends Activity
         }
     }
 
+    protected static void hexStringToBytes(final String input, final byte[] output) {
+        final int len = output.length;
+        for (int i = 0; i < len; i++) {
+            output[i] = (byte)Integer.parseInt(input.substring(i * 2, i * 2 + 2), 16);
+        }
+    }
+
     @Override
     public void onPause() {
         super.onPause();
