@@ -93,6 +93,7 @@ public class Main extends Activity
         }
 
         protected void processCommand(final String cmd) throws IOException {
+            try {
             if (cmd.equals("help")) {
                 output.println("Available commands are: rdbl, rdsc, wrbl, wrsc");
             } else if (cmd.indexOf("rdbl") == 0) {
@@ -105,32 +106,30 @@ public class Main extends Activity
             } else {
                 output.println("Unrecognized command");
             }
+            } catch (CommandException ne) {
+                output.println(getString(R.string.error, ne.getMessage()));
+            }
         }
 
-        protected void processReadBlock(final String[] params) throws IOException {
+        protected void processReadBlock(final String[] params) throws IOException, CommandException {
             int blockIndex;
             try {
                 blockIndex = Integer.parseInt(params[1]);
             } catch (NumberFormatException nfe) {
-                output.println("Invalid block index");
-                return;
+                throw new CommandException(getString(R.string.invalid_block_index, params[1]));
             }
             final int sectorIndex = mfc.blockToSector(blockIndex);
-            if (!authForSector(params[2], sectorIndex, params[3])) {
-                output.println("Authentication failed");
-                return;
-            }
+            authForSector(params[2], sectorIndex, params[3]);
             readAndSendBlockContents(blockIndex);
         }
 
-        protected boolean authForSector(final String ab, final int sectorIndex,
-                final String hexkey) throws IOException {
+        protected void authForSector(final String ab, final int sectorIndex,
+                final String hexkey) throws IOException, CommandException {
             final byte[] key = new byte[6];
             try {
                 hexStringToBytes(hexkey, key);
             } catch (Exception e) {
-                output.println("Invalid key");
-                return false;
+                throw new CommandException(getString(R.string.invalid_key, hexkey));
             }
             boolean auth;
             if (ab.charAt(0) == 'A') {
@@ -138,7 +137,7 @@ public class Main extends Activity
             } else {
                 auth = mfc.authenticateSectorWithKeyB(sectorIndex, key);
             }
-            return auth;
+            if (!auth) throw new CommandException(getString(R.string.auth_fail));
         }
 
         protected void readAndSendBlockContents(final int blockIndex) throws IOException {
@@ -167,6 +166,12 @@ public class Main extends Activity
         final int len = output.length;
         for (int i = 0; i < len; i++) {
             output[i] = (byte)Integer.parseInt(input.substring(i * 2, i * 2 + 2), 16);
+        }
+    }
+
+    protected static class CommandException extends Exception {
+        public CommandException(String detailMessage) {
+            super(detailMessage);
         }
     }
 
