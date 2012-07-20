@@ -115,24 +115,33 @@ public class Main extends Activity
                 output.println("Invalid block index");
                 return;
             }
-            boolean auth;
             final int sectorIndex = mfc.blockToSector(blockIndex);
-            final byte[] key = new byte[6];
-            try {
-                hexStringToBytes(params[3], key);
-            } catch (Exception e) {
-                output.println("Invalid key");
+            if (!authForSector(params[2], sectorIndex, params[3])) {
+                output.println("Authentication failed");
                 return;
             }
-            if (params[2].charAt(0) == 'A') {
+            readAndSendBlockContents(blockIndex);
+        }
+
+        protected boolean authForSector(final String ab, final int sectorIndex,
+                final String hexkey) throws IOException {
+            final byte[] key = new byte[6];
+            try {
+                hexStringToBytes(hexkey, key);
+            } catch (Exception e) {
+                output.println("Invalid key");
+                return false;
+            }
+            boolean auth;
+            if (ab.charAt(0) == 'A') {
                 auth = mfc.authenticateSectorWithKeyA(sectorIndex, key);
             } else {
                 auth = mfc.authenticateSectorWithKeyB(sectorIndex, key);
             }
-            if (!auth) {
-                output.println("Authentication failed");
-                return;
-            }
+            return auth;
+        }
+
+        protected void readAndSendBlockContents(final int blockIndex) throws IOException {
             final byte[] contents = mfc.readBlock(blockIndex);
             output.print("Received: ");
             for (byte b : contents) {
