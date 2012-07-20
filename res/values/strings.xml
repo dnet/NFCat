@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">NFCat</string>
+    <string name="listening">Listening on port %d</string>
+    <string name="connected">Client connected from %s</string>
+    <string name="exception">An exception was thrown: %s</string>
 </resources>

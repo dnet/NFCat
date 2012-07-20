@@ -1,11 +1,13 @@
 package hu.silentsignal.android.nfcat;
 
 import android.app.Activity;
-import android.os.Bundle;
+import android.os.*;
 import android.content.*;
 import android.app.*;
 import android.nfc.*;
 import android.nfc.tech.MifareClassic;
+import android.widget.TextView;
+import java.net.*;
 import java.io.IOException;
 
 public class Main extends Activity
@@ -56,8 +58,35 @@ public class Main extends Activity
 
         if (NfcAdapter.ACTION_TECH_DISCOVERED.equals(action)) {
             Tag tagFromIntent = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
-            MifareClassic mfc = MifareClassic.get(tagFromIntent);
-            // TODO
+            new NetworkService().execute(tagFromIntent);
+        }
+    }
+
+    protected class NetworkService extends AsyncTask<Tag, String, Void> {
+        @Override
+        protected Void doInBackground(Tag... tags) {
+            try {
+                final MifareClassic mfc = MifareClassic.get(tags[0]);
+                final ServerSocket ss = new ServerSocket(0);
+                publishProgress(getString(R.string.listening, ss.getLocalPort()));
+                final Socket s = ss.accept();
+                publishProgress(getString(R.string.connected, s.getRemoteSocketAddress().toString()));
+            } catch (IOException ioe) {
+                publishProgress(getString(R.string.exception, ioe.toString()));
+            }
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(String... progress) {
+            super.onProgressUpdate(progress);
+            final TextView tv = (TextView)findViewById(R.id.output);
+            final StringBuilder sb = new StringBuilder(tv.getText());
+            for (String s : progress) {
+                sb.append(s);
+                sb.append('\n');
+            }
+            tv.setText(sb);
         }
     }
 
