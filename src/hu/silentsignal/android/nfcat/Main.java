@@ -95,9 +95,50 @@ public class Main extends Activity
         protected void processCommand(final String cmd) throws IOException {
             if (cmd.equals("help")) {
                 output.println("Available commands are: rdbl, rdsc, wrbl, wrsc");
+            } else if (cmd.indexOf("rdbl") == 0) {
+                final String[] params = cmd.split(" ");
+                if (params.length < 4) {
+                    output.println("Usage: rdbl <sector> <A/B> <key>");
+                } else {
+                    processReadBlock(params);
+                }
             } else {
                 output.println("Unrecognized command");
             }
+        }
+
+        protected void processReadBlock(final String[] params) throws IOException {
+            int blockIndex;
+            try {
+                blockIndex = Integer.parseInt(params[1]);
+            } catch (NumberFormatException nfe) {
+                output.println("Invalid block index");
+                return;
+            }
+            boolean auth;
+            final int sectorIndex = mfc.blockToSector(blockIndex);
+            final byte[] key = new byte[6];
+            try {
+                hexStringToBytes(params[3], key);
+            } catch (Exception e) {
+                output.println("Invalid key");
+                return;
+            }
+            if (params[2].charAt(0) == 'A') {
+                auth = mfc.authenticateSectorWithKeyA(sectorIndex, key);
+            } else {
+                auth = mfc.authenticateSectorWithKeyB(sectorIndex, key);
+            }
+            if (!auth) {
+                output.println("Authentication failed");
+                return;
+            }
+            final byte[] contents = mfc.readBlock(blockIndex);
+            output.print("Received: ");
+            for (byte b : contents) {
+                output.format("%02X", b);
+            }
+            output.println("");
         }
 
         @Override
