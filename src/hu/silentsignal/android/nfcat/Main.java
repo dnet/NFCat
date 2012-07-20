@@ -8,7 +8,7 @@ import android.nfc.*;
 import android.nfc.tech.MifareClassic;
 import android.widget.TextView;
 import java.net.*;
-import java.io.IOException;
+import java.io.*;
 
 public class Main extends Activity
 {
