@@ -96,6 +96,13 @@ public class Main extends Activity
             try {
             if (cmd.equals("help")) {
                 output.println("Available commands are: rdbl, rdsc, wrbl, wrsc");
+            } else if (cmd.indexOf("rdsc") == 0) {
+                final String[] params = cmd.split(" ");
+                if (params.length < 4) {
+                    output.println("Usage: rdsc <sector> <A/B> <key>");
+                } else {
+                    processReadSector(params);
+                }
             } else if (cmd.indexOf("rdbl") == 0) {
                 final String[] params = cmd.split(" ");
                 if (params.length < 4) {
@@ -108,6 +115,21 @@ public class Main extends Activity
             }
             } catch (CommandException ne) {
                 output.println(getString(R.string.error, ne.getMessage()));
+            }
+        }
+
+        protected void processReadSector(final String[] params) throws IOException, CommandException {
+            int sectorIndex;
+            try {
+                sectorIndex = Integer.parseInt(params[1]);
+            } catch (NumberFormatException nfe) {
+                throw new CommandException(getString(R.string.invalid_sector_index, params[1]));
+            }
+            authForSector(params[2], sectorIndex, params[3]);
+            final int startBlockIndex = mfc.sectorToBlock(sectorIndex);
+            final int blockCount = mfc.getBlockCountInSector(sectorIndex);
+            for (int i = 0; i < blockCount; i++) {
+                readAndSendBlockContents(startBlockIndex + i);
             }
         }
 

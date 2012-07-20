@@ -7,5 +7,6 @@
     <string name="error">Command resulted in error: %s</string>
     <string name="auth_fail">authentication failed</string>
     <string name="invalid_block_index">invalid block index: %s (should be a non-negative number)</string>
+    <string name="invalid_sector_index">invalid sector index: %s (should be a non-negative number)</string>
     <string name="invalid_key">invalid key: %s (should be 12 hexadecimal digits)</string>
 </resources>
