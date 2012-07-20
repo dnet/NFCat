@@ -99,7 +99,7 @@ public class Main extends Activity
             } else if (cmd.indexOf("rdbl") == 0) {
                 final String[] params = cmd.split(" ");
                 if (params.length < 4) {
-                    output.println("Usage: rdbl <sector> <A/B> <key>");
+                    output.println("Usage: rdbl <block> <A/B> <key>");
                 } else {
                     processReadBlock(params);
                 }
