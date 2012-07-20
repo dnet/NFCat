@@ -95,7 +95,7 @@ public class Main extends Activity
         protected void processCommand(final String cmd) throws IOException {
             try {
             if (cmd.equals("help")) {
-                output.println("Available commands are: rdbl, rdsc, wrbl, wrsc");
+                output.println("Available commands are: rdbl, rdsc");
             } else if (cmd.indexOf("rdsc") == 0) {
                 final String[] params = cmd.split(" ");
                 if (params.length < 4) {
