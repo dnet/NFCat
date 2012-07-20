@@ -8,6 +8,8 @@
     <string name="auth_fail">authentication failed</string>
     <string name="invalid_block_index">invalid block index: %s (should be a non-negative number)</string>
     <string name="invalid_sector_index">invalid sector index: %s (should be a non-negative number)</string>
+    <string name="invalid_value">invalid value: %s (should be a non-negative number)</string>
     <string name="invalid_key">invalid key: %s (should be 12 hexadecimal digits)</string>
     <string name="read_error">couldn\'t read block %1$d: %2$s</string>
+    <string name="success">Operation completed successfully.</string>
 </resources>

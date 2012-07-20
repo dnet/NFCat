@@ -95,7 +95,14 @@ public class Main extends Activity
         protected void processCommand(final String cmd) throws IOException {
             try {
             if (cmd.equals("help")) {
-                output.println("Available commands are: rdbl, rdsc");
+                output.println("Available commands are: rdbl, rdsc, dec");
+            } else if (cmd.indexOf("dec") == 0) {
+                final String[] params = cmd.split(" ");
+                if (params.length < 5) {
+                    output.println("Usage: dec <block> <value> <A/B> <key>");
+                } else {
+                    processDecrementBlock(params);
+                }
             } else if (cmd.indexOf("rdsc") == 0) {
                 final String[] params = cmd.split(" ");
                 if (params.length < 4) {
@@ -116,6 +123,25 @@ public class Main extends Activity
             } catch (CommandException ne) {
                 output.println(getString(R.string.error, ne.getMessage()));
             }
+        }
+
+        protected void processDecrementBlock(final String[] params) throws IOException, CommandException {
+            int blockIndex;
+            try {
+                blockIndex = Integer.parseInt(params[1]);
+            } catch (NumberFormatException nfe) {
+                throw new CommandException(getString(R.string.invalid_block_index, params[1]));
+            }
+            int value;
+            try {
+                value = Integer.parseInt(params[2]);
+            } catch (NumberFormatException nfe) {
+                throw new CommandException(getString(R.string.invalid_value, params[2]));
+            }
+            final int sectorIndex = mfc.blockToSector(blockIndex);
+            authForSector(params[3], sectorIndex, params[4]);
+            mfc.decrement(blockIndex, value);
+            output.println(getString(R.string.success));
         }
 
         protected void processReadSector(final String[] params) throws IOException, CommandException {
