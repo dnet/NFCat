@@ -63,6 +63,7 @@ public class Main extends Activity
     }
 
     protected class NetworkService extends AsyncTask<Tag, String, Void> {
+        protected PrintWriter output;
         protected MifareClassic mfc;
 
         @Override
@@ -73,10 +74,29 @@ public class Main extends Activity
                 publishProgress(getString(R.string.listening, ss.getLocalPort()));
                 final Socket s = ss.accept();
                 publishProgress(getString(R.string.connected, s.getRemoteSocketAddress().toString()));
+                final BufferedReader input = new BufferedReader(
+                        new InputStreamReader(s.getInputStream(), "UTF-8"));
+                output = new PrintWriter(
+                        new OutputStreamWriter(s.getOutputStream(), "UTF-8"));
+                while (true) {
+                    output.print("nfcat> ");
+                    output.flush();
+                    final String cmd = input.readLine();
+                    if (cmd == null) break;
+                    processCommand(cmd);
+                }
             } catch (IOException ioe) {
                 publishProgress(getString(R.string.exception, ioe.toString()));
             }
             return null;
+        }
+
+        protected void processCommand(final String cmd) throws IOException {
+            if (cmd.equals("help")) {
+                output.println("Available commands are: rdbl, rdsc, wrbl, wrsc");
+            } else {
+                output.println("Unrecognized command");
+            }
         }
 
         @Override
