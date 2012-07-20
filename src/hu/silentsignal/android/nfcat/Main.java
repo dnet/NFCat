@@ -118,7 +118,7 @@ public class Main extends Activity
                     processReadBlock(params);
                 }
             } else {
-                output.println("Unrecognized command");
+                output.println(getString(R.string.unrecognized_cmd));
             }
             } catch (CommandException ne) {
                 output.println(getString(R.string.error, ne.getMessage()));
