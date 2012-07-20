@@ -70,6 +70,7 @@ public class Main extends Activity
         protected Void doInBackground(Tag... tags) {
             try {
                 mfc = MifareClassic.get(tags[0]);
+                mfc.connect();
                 final ServerSocket ss = new ServerSocket(0);
                 publishProgress(getString(R.string.listening, ss.getLocalPort()));
                 final Socket s = ss.accept();
