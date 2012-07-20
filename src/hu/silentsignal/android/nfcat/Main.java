@@ -63,10 +63,12 @@ public class Main extends Activity
     }
 
     protected class NetworkService extends AsyncTask<Tag, String, Void> {
+        protected MifareClassic mfc;
+
         @Override
         protected Void doInBackground(Tag... tags) {
             try {
-                final MifareClassic mfc = MifareClassic.get(tags[0]);
+                mfc = MifareClassic.get(tags[0]);
                 final ServerSocket ss = new ServerSocket(0);
                 publishProgress(getString(R.string.listening, ss.getLocalPort()));
                 final Socket s = ss.accept();
