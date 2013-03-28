@@ -95,7 +95,14 @@ public class Main extends Activity
         protected void processCommand(final String cmd) throws IOException {
             try {
             if (cmd.equals("help")) {
-                output.println("Available commands are: rdbl, rdsc, dec");
+                output.println("Available commands are: rdbl, rdsc, dec, xfer");
+            } else if (cmd.indexOf("xfer") == 0) {
+                final String[] params = cmd.split(" ");
+                if (params.length < 4) {
+                    output.println("Usage: xfer <block> <A/B> <key>");
+                } else {
+                    processTransferBlock(params);
+                }
             } else if (cmd.indexOf("dec") == 0) {
                 final String[] params = cmd.split(" ");
                 if (params.length < 5) {
@@ -123,6 +130,19 @@ public class Main extends Activity
             } catch (CommandException ne) {
                 output.println(getString(R.string.error, ne.getMessage()));
             }
+        }
+
+        protected void processTransferBlock(final String[] params) throws IOException, CommandException {
+            int blockIndex;
+            try {
+                blockIndex = Integer.parseInt(params[1]);
+            } catch (NumberFormatException nfe) {
+                throw new CommandException(getString(R.string.invalid_block_index, params[1]));
+            }
+            final int sectorIndex = mfc.blockToSector(blockIndex);
+            authForSector(params[2], sectorIndex, params[3]);
+            mfc.transfer(blockIndex);
+            output.println(getString(R.string.success));
         }
 
         protected void processDecrementBlock(final String[] params) throws IOException, CommandException {
